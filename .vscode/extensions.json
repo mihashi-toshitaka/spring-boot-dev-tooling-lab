@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-boot-dev-pack",
+        "shengchen.vscode-checkstyle",
+        "sonarsource.sonarlint-vscode",
+        "richardwillis.vscode-spotless-gradle"
+    ]
+}
