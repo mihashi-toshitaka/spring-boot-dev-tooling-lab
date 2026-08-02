@@ -144,13 +144,15 @@ sudo apt install -y python3 python3-pip
 
 | ツール | 目的 | このプロジェクトでの設定・実行例 |
 | --- | --- | --- |
-| **Checkstyle** | Java のコーディング規約を検査する | config/checkstyle/checkstyle.xml、./gradlew checkstyleMain checkstyleTest |
-| **SpotBugs** | Java バイトコードから潜在的なバグを検出する | ./gradlew spotbugsMain spotbugsTest または ./gradlew check |
-| **SonarLint** | コードスメル、バグ、脆弱性などをエディター上で早期検出する | VS Code 拡張機能で使用。Gradle の解析タスクはこのサンプルでは設定していない |
-| **Spotless** | Java ソースコードを自動整形し、フォーマット違反を検出する | Palantir Java Format、./gradlew spotlessCheck、./gradlew spotlessApply |
-| **OpenRewrite** | Java / Spring の移行や静的なコード変換を自動化する | ./gradlew rewriteDryRun、./gradlew rewriteRun |
-| **Error Prone** | Java のコンパイル時に潜在的なバグパターンを検出する | ./gradlew compileJava または ./gradlew check |
-| **ArchUnit** | クラス構成やアーキテクチャ上のルールをテストとして検査する | ./gradlew test または ./gradlew check |
+| **Checkstyle** | Java のコーディング規約を検査する | [Checkstyle ガイド](docs/checkstyle-guide.md)、config/checkstyle/checkstyle.xml、./gradlew checkstyleMain checkstyleTest |
+| **SpotBugs** | Java バイトコードから潜在的なバグを検出する | [SpotBugs ガイド](docs/spotbugs-guide.md)、./gradlew spotbugsMain spotbugsTest または ./gradlew check |
+| **SonarLint** | コードスメル、バグ、脆弱性などをエディター上で早期検出する | [SonarQube for IDE ガイド](docs/sonarqube-for-ide-guide.md)。Gradle の解析タスクはこのサンプルでは設定していない |
+| **Spotless** | Java ソースコードを自動整形し、フォーマット違反を検出する | [Spotless ガイド](docs/spotless-guide.md)、Palantir Java Format、./gradlew spotlessCheck、./gradlew spotlessApply |
+| **OpenRewrite** | Java / Spring の移行や静的なコード変換を自動化する | [OpenRewrite ガイド](docs/openrewrite-guide.md)、./gradlew rewriteDryRun、./gradlew rewriteRun |
+| **Error Prone** | Java のコンパイル時に潜在的なバグパターンを検出する | [Error Prone ガイド](docs/error-prone-guide.md)、./gradlew compileJava または ./gradlew check |
+| **ArchUnit** | クラス構成やアーキテクチャ上のルールをテストとして検査する | [ArchUnit ガイド](docs/archunit-guide.md)、./gradlew test または ./gradlew check |
+
+各ツールの役割分担と推奨実行順は、[コード品質ツールガイド](docs/code-quality-tools.md) にまとめています。
 
 ### SpotBugs
 
