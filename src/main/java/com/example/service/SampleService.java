@@ -9,7 +9,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class SampleService {
 
-    public final String test = "test";
+    public final String test;
+
+    /**
+     * SampleService
+     */
+    public SampleService() {
+        this.test = "test";
+    }
 
     /**
      * service

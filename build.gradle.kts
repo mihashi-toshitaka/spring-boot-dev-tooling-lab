@@ -1,3 +1,6 @@
+import com.github.spotbugs.snom.Confidence
+import com.github.spotbugs.snom.Effort
+import com.github.spotbugs.snom.SpotBugsTask
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
@@ -8,6 +11,7 @@ plugins {
     id("com.diffplug.spotless") version "8.8.0"
     id("org.openrewrite.rewrite") version "7.37.0"
     id("net.ltgt.errorprone") version "5.1.0"
+    id("com.github.spotbugs") version "6.5.9"
     id("checkstyle")
 }
 
@@ -46,6 +50,12 @@ checkstyle {
     configDirectory = file("config/checkstyle")
 }
 
+spotbugs {
+    ignoreFailures = false
+    effort = Effort.DEFAULT
+    reportLevel = Confidence.DEFAULT
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
@@ -65,4 +75,12 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.withType<SpotBugsTask>().configureEach {
+    val spotBugsTaskName = name
+    reports.create("html") {
+        required = true
+        outputLocation = layout.buildDirectory.file("reports/spotbugs/$spotBugsTaskName.html")
+    }
 }

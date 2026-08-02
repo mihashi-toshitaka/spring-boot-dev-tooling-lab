@@ -145,11 +145,22 @@ sudo apt install -y python3 python3-pip
 | ツール | 目的 | このプロジェクトでの設定・実行例 |
 | --- | --- | --- |
 | **Checkstyle** | Java のコーディング規約を検査する | config/checkstyle/checkstyle.xml、./gradlew checkstyleMain checkstyleTest |
+| **SpotBugs** | Java バイトコードから潜在的なバグを検出する | ./gradlew spotbugsMain spotbugsTest または ./gradlew check |
 | **SonarLint** | コードスメル、バグ、脆弱性などをエディター上で早期検出する | VS Code 拡張機能で使用。Gradle の解析タスクはこのサンプルでは設定していない |
 | **Spotless** | Java ソースコードを自動整形し、フォーマット違反を検出する | Palantir Java Format、./gradlew spotlessCheck、./gradlew spotlessApply |
 | **OpenRewrite** | Java / Spring の移行や静的なコード変換を自動化する | ./gradlew rewriteDryRun、./gradlew rewriteRun |
 | **Error Prone** | Java のコンパイル時に潜在的なバグパターンを検出する | ./gradlew compileJava または ./gradlew check |
 | **ArchUnit** | クラス構成やアーキテクチャ上のルールをテストとして検査する | ./gradlew test または ./gradlew check |
+
+### SpotBugs
+
+SpotBugs は、コンパイル済みの Java バイトコードを解析して潜在的なバグを検出します。このプロジェクトでは、アプリケーションコードとテストコードをそれぞれ `spotbugsMain`、`spotbugsTest` で解析します。
+
+~~~bash
+./gradlew spotbugsMain spotbugsTest
+~~~
+
+指摘がある場合はタスクが失敗します。HTML レポートは `build/reports/spotbugs/` 配下の `spotbugsMain.html` と `spotbugsTest.html` に生成されます。両タスクは `check` に含まれるため、通常は `./gradlew check` でほかの品質チェックとまとめて実行できます。
 
 ### ArchUnit
 
@@ -176,7 +187,7 @@ ArchUnit は、Java のクラス構成や依存関係などのアーキテクチ
 git diff
 ~~~
 
-`check` では、テスト、Checkstyle、Spotless の検査など、プロジェクトに設定された検査タスクが実行されます。
+`check` では、テスト、Checkstyle、SpotBugs、Spotless の検査など、プロジェクトに設定された検査タスクが実行されます。
 
 OpenRewrite の適用内容を事前に確認する場合は、`rewriteDryRun` を使用できます。
 
@@ -297,6 +308,7 @@ VS Code からは、Gradle のサイドバーでタスクを確認したり、Ja
 - [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
 - [Spring Boot Extension Pack](https://marketplace.visualstudio.com/items?itemName=vmware.vscode-boot-dev-pack)
 - [Checkstyle for VS Code](https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle)
+- [SpotBugs](https://spotbugs.github.io/)
 - [SonarQube for IDE](https://marketplace.visualstudio.com/items?itemName=sonarsource.sonarlint-vscode)
 - [Spotless Gradle](https://marketplace.visualstudio.com/items?itemName=richardwillis.vscode-spotless-gradle)
 - [Gradle 公式ドキュメント](https://docs.gradle.org/)
