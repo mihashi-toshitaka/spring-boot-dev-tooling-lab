@@ -1,6 +1,6 @@
-package com.example.controller;
+package com.example.api.controller;
 
-import com.example.service.SampleService;
+import com.example.api.service.SampleService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +15,8 @@ public class SampleController {
 
     /**
      * SampleController
-     * @param testService sampleService
+     *
+     * @param sampleService sample service
      */
     public SampleController(SampleService sampleService) {
         this.sampleService = sampleService;

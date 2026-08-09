@@ -1,0 +1,129 @@
+:root {
+    color-scheme: light;
+    font-family:
+        Inter, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    color: #17332c;
+    background: #f1f7f3;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    background:
+        radial-gradient(circle at top right, rgb(108 181 107 / 28%), transparent 34rem),
+        linear-gradient(160deg, #f8fbf9 0%, #e7f2eb 100%);
+}
+
+.page-shell {
+    width: min(68rem, calc(100% - 2rem));
+    margin: 0 auto;
+    padding: clamp(4rem, 10vw, 8rem) 0 2rem;
+}
+
+.hero {
+    max-width: 48rem;
+}
+
+.eyebrow {
+    margin: 0 0 1rem;
+    color: #367d4a;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+}
+
+h1,
+h2,
+p {
+    margin-top: 0;
+}
+
+h1 {
+    margin-bottom: 1.25rem;
+    font-size: clamp(2.6rem, 8vw, 5.8rem);
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+}
+
+.lead {
+    max-width: 38rem;
+    margin-bottom: 0;
+    color: #46645b;
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    line-height: 1.8;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: clamp(3rem, 8vw, 6rem);
+}
+
+.feature-card {
+    min-height: 14rem;
+    padding: 1.5rem;
+    border: 1px solid rgb(23 51 44 / 12%);
+    border-radius: 1.25rem;
+    background: rgb(255 255 255 / 72%);
+    box-shadow: 0 1rem 3rem rgb(23 51 44 / 8%);
+    backdrop-filter: blur(0.75rem);
+}
+
+.feature-number {
+    display: block;
+    margin-bottom: 2.5rem;
+    color: #4f9f62;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.feature-card h2 {
+    margin-bottom: 0.75rem;
+    font-size: 1.15rem;
+}
+
+.feature-card p {
+    margin-bottom: 0;
+    color: #526c64;
+    line-height: 1.75;
+}
+
+code {
+    padding: 0.12rem 0.35rem;
+    border-radius: 0.3rem;
+    color: #255f38;
+    background: #e0eee4;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.9em;
+}
+
+footer {
+    margin-top: 2rem;
+    color: #657c75;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 48rem) {
+    .page-shell {
+        padding-top: 4rem;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .feature-card {
+        min-height: auto;
+    }
+
+    .feature-number {
+        margin-bottom: 1.5rem;
+    }
+}

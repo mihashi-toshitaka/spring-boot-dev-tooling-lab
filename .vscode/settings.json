@@ -9,5 +9,6 @@
       "source.fixAll.spotlessGradle": "explicit"
     }
   },
+  "java.checkstyle.version": "13.7.0",
   "java.checkstyle.configuration": "${workspaceFolder}/config/checkstyle/checkstyle.xml"
 }

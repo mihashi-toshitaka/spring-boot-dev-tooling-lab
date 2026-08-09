@@ -154,6 +154,13 @@ sudo apt install -y python3 python3-pip
 
 各ツールの役割分担と推奨実行順は、[コード品質ツールガイド](docs/code-quality-tools.md) にまとめています。
 
+Spring Boot の各種機能については、次のガイドを参照してください。
+
+- [Spring Boot DevTools ガイド](docs/spring-ecosystem/spring-boot-devtools-guide.md)
+- [Spring Boot Actuator ガイド](docs/spring-ecosystem/spring-boot-actuator-guide.md)
+- [Spring Boot Configuration Processor ガイド](docs/spring-ecosystem/spring-boot-configuration-processor-guide.md)
+- [Spring Boot Thymeleaf ガイド](docs/spring-ecosystem/spring-boot-thymeleaf-guide.md)
+
 ### SpotBugs
 
 SpotBugs は、コンパイル済みの Java バイトコードを解析して潜在的なバグを検出します。このプロジェクトでは、アプリケーションコードとテストコードをそれぞれ `spotbugsMain`、`spotbugsTest` で解析します。
