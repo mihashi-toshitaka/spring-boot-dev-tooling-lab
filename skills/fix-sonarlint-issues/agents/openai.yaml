@@ -1,0 +1,4 @@
+interface:
+  display_name: "SonarLint 指摘を修正"
+  short_description: "SonarLint の波線箇所を調査して安全に自動修正します"
+  default_prompt: "$fix-sonarlint-issues を使って、SonarLint の指摘箇所を修正し、変更を検証してください。"

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "spring-boot-dev-tooling-lab",
+  "version": "1.0.0",
+  "description": "Fix SonarLint issues in Spring Boot projects and verify the resulting changes with the Gradle Wrapper.",
+  "repository": "https://github.com/mihashi-toshitaka/spring-boot-dev-tooling-lab",
+  "keywords": [
+    "spring-boot",
+    "gradle",
+    "java",
+    "sonarlint",
+    "development-tooling",
+    "code-quality"
+  ]
+}
