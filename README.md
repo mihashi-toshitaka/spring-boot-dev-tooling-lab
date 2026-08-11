@@ -160,7 +160,7 @@ Spring Boot の各種機能については、次のガイドを参照してく�
 - [Spring Boot Actuator ガイド](docs/spring-ecosystem/spring-boot-actuator-guide.md)
 - [Spring Boot Configuration Processor ガイド](docs/spring-ecosystem/spring-boot-configuration-processor-guide.md)
 - [Spring Boot Thymeleaf ガイド](docs/spring-ecosystem/spring-boot-thymeleaf-guide.md)
-- [Spring Security ログインガイド](docs/spring-ecosystem/spring-security-login-guide.md)
+- [Spring Security ガイド](docs/spring-ecosystem/spring-security-guide.md)
 - [Spring Session + Valkey ガイド](docs/spring-ecosystem/spring-session-valkey-guide.md)
 
 ### SpotBugs

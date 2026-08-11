@@ -58,7 +58,7 @@ APP_INITIAL_USER_PASSWORD='application-secret' \
 
 TLS 接続を使う環境では、接続先の仕様に合わせて `rediss://` 形式の URL を指定します。ユーザー名やパスワードに URL の予約文字が含まれる場合は、パーセントエンコーディングが必要です。
 
-`application-production.yaml` の接続情報には既定値を設けていません。`production` プロファイルで接続先が未設定の場合は起動に失敗し、誤ってローカルホストへ接続することを防ぎます。認証設定の詳細は [Spring Security ログインガイド](spring-security-login-guide.md)を参照してください。
+`application-production.yaml` の接続情報には既定値を設けていません。`production` プロファイルで接続先が未設定の場合は起動に失敗し、誤ってローカルホストへ接続することを防ぎます。認証・認可設定の詳細は [Spring Security ガイド](spring-security-guide.md)を参照してください。
 
 ## 5. セッション設定
 
