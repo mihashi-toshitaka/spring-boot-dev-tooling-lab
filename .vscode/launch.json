@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-SpringBootDevToolingLabApplication<spring-boot-dev-tooling-lab>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.SpringBootDevToolingLabApplication",
+            "projectName": "spring-boot-dev-tooling-lab",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-TestSpringBootDevToolingLabApplication<spring-boot-dev-tooling-lab>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.TestSpringBootDevToolingLabApplication",
+            "projectName": "spring-boot-dev-tooling-lab",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

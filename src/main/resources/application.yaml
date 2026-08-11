@@ -1,3 +1,18 @@
 spring:
   application:
     name: spring-boot-dev-tooling-lab
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/spring_boot_dev_tooling_lab}
+    username: ${DATABASE_USERNAME:app}
+    password: ${DATABASE_PASSWORD:app}
+  session:
+    timeout: ${SESSION_TIMEOUT:30m}
+    data:
+      redis:
+        namespace: ${SESSION_REDIS_NAMESPACE:spring-boot-dev-tooling-lab:session}
+
+app:
+  security:
+    initial-user:
+      username: ${APP_INITIAL_USER_USERNAME:user}
+      password: ${APP_INITIAL_USER_PASSWORD:password}

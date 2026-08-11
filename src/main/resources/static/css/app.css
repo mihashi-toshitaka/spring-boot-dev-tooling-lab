@@ -25,6 +25,33 @@ body {
     padding: clamp(4rem, 10vw, 8rem) 0 2rem;
 }
 
+.session-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid rgb(23 51 44 / 12%);
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 72%);
+}
+
+.session-card p {
+    margin: 0;
+}
+
+.session-card button {
+    padding: 0.65rem 1rem;
+    border: 0;
+    border-radius: 0.7rem;
+    color: #fff;
+    background: #367d4a;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 .hero {
     max-width: 48rem;
 }

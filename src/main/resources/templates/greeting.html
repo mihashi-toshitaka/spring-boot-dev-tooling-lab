@@ -9,6 +9,13 @@
 </head>
 <body>
     <main class="page-shell">
+        <aside class="session-card" aria-label="ログイン情報">
+            <p><strong th:text="${username}">user</strong> としてログイン中</p>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit">ログアウト</button>
+            </form>
+        </aside>
+
         <section class="hero" aria-labelledby="page-title">
             <p class="eyebrow">SPRING ECOSYSTEM</p>
             <h1 id="page-title" th:text="${title}">Spring Boot + Thymeleaf</h1>

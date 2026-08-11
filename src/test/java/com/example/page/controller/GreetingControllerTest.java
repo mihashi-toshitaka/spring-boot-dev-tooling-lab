@@ -10,9 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(GreetingController.class)
+@WithMockUser(username = "test-user")
 class GreetingControllerTest {
 
     @Autowired
@@ -25,7 +27,9 @@ class GreetingControllerTest {
                 .andExpect(view().name("greeting"))
                 .andExpect(model().attribute("title", "Spring Boot + Thymeleaf"))
                 .andExpect(model().attribute("message", "Thymeleafの画面表示が利用できます。"))
+                .andExpect(model().attribute("username", "test-user"))
                 .andExpect(content().string(containsString("Spring Boot + Thymeleaf")))
+                .andExpect(content().string(containsString("test-user")))
                 .andExpect(content().string(containsString("/css/app.css")));
     }
 }
