@@ -40,7 +40,7 @@ Servlet アプリケーションでは、Spring Security は Controller より�
 | `SecurityContext` | 現在の認証情報を保持する |
 | `Authentication` | 認証処理への入力、または認証済み利用者とその権限を表す |
 | `GrantedAuthority` | `ROLE_USER` や `report:read` など、利用者に付与された権限を表す |
-| `AuthenticationManager` | 認証要求を適切な `AuthenticationProvider` へ渡す |
+| `AuthenticationManager` | 認証を実行する API。代表実装の `ProviderManager` は認証要求を適切な `AuthenticationProvider` へ渡す |
 | `AuthenticationProvider` | パスワード、Token などの方式に応じて資格情報を検証する |
 | `UserDetailsService` | ユーザー名からパスワードハッシュ、状態、権限を読み込む |
 | `PasswordEncoder` | パスワードを一方向変換し、入力値と保存値を照合する |
@@ -66,6 +66,8 @@ Servlet アプリケーションでは、Spring Security は Controller より�
 | `GET /api/private` | HTTP Basic による認証が必要 | ステートレス |
 | `/css/**`、`/error` | 認証不要 | `HttpSession`（必要な場合のみ） |
 | `/greeting` など上記以外 | フォームログインによる認証が必要 | `HttpSession` を Valkey に保存 |
+
+`/login` と `/logout` は Spring Security の Filter が提供する認証用のエンドポイントです。上表の「上記以外」には、これらの認証処理用エンドポイントを含めません。
 
 設定の中心は `SecurityConfiguration.java` です。
 
@@ -105,6 +107,8 @@ SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
 - matcher を指定していない画面用チェーンは、API 以外を受ける最後の catch-all になる
 - どのチェーンにも一致しないリクエストは Spring Security で保護されないため、最後の catch-all を維持する
 
+`requestMatchers("/api/public")` 自体は HTTP メソッドを限定しません。現在は Controller が `GET` だけを定義していますが、同じパスへ状態変更処理を追加する場合は `requestMatchers(HttpMethod.GET, "/api/public")` のようにメソッドも含めて最小権限にします。
+
 現在の `/actuator/**` も画面用の catch-all チェーンに入り、認証が必要です。Actuator 専用チェーンを追加する場合は API チェーンより後、catch-all より前となるよう matcher と `@Order` を設計してください。
 
 静的リソースには `permitAll()` を使っています。セキュリティ Filter 自体を迂回する `ignoring()` と異なり、認証不要のリソースにもセキュリティ用レスポンスヘッダーを付与できます。
@@ -130,13 +134,17 @@ Base64 は暗号化ではありません。本番環境では必ず HTTPS 経由
 | 機能 | 適した用途 | 主な注意点 |
 | --- | --- | --- |
 | OAuth 2.0 / OIDC Login | 組織 ID や外部 ID プロバイダーによるブラウザーログイン | Spring Boot 4.1 では `spring-boot-starter-security-oauth2-client` を追加し、Authorization Code Flow を利用する |
-| OAuth 2.0 Resource Server | 受信 API の Bearer JWT または Opaque Token を検証する | `spring-boot-starter-security-oauth2-resource-server` を追加し、署名だけでなく issuer、audience、有効期限、scope を検証する |
+| OAuth 2.0 Resource Server（JWT） | 受信 API の Bearer JWT をローカルで検証する | `spring-boot-starter-security-oauth2-resource-server` を追加し、署名、issuer、有効期間を検証する。audience は明示的に設定する |
+| OAuth 2.0 Resource Server（Opaque Token） | Introspection Endpoint で Bearer Token の状態と属性を確認する | Introspection 用の Client 資格情報、TLS、Authorization Server 障害時の動作を設計する |
 | OAuth 2.0 Client | 利用者またはアプリケーションの権限で外部 API を呼び出す | Access Token と Refresh Token をログやレスポンスへ出さず、安全に保存する |
 | Remember-Me | セッション終了後もブラウザーのログイン状態を復元する | 長期間有効な Cookie になるため、必要性、失効、Token の保存方式を設計する |
 | LDAP / SAML 2.0 | 既存の企業ディレクトリやフェデレーションと連携する | 専用モジュールとプロバイダー側の設定が必要になる |
-| MFA / Passkeys / One-Time Token | パスワードだけに依存しない強い認証を行う | Spring Security 7.1 の MFA 機能などを利用できるが、登録、回復、監査を含む運用設計が必要になる |
+| MFA | 複数の認証要素を必須にする | Spring Security 7.1 の `FactorGrantedAuthority` などを構成し、必要な要素を認可ルールで明示的に要求する |
+| Passkeys / One-Time Token | パスワード以外の認証方式を提供する | 登録、配信、失効、回復、監査を設計する。One-Time Token はサーバーが生成した Token をメールや SMS などで届ける方式で、TOTP とは異なる |
 
 OAuth 2.0 Login は利用者をブラウザーでログインさせる Client 機能、Resource Server は API に届いた Bearer Token を検証する機能です。Resource Server 自体は Token を発行しません。JWT を独自コードで分解して認証済みと判断せず、Spring Security の検証機能を使用してください。
+
+JWT や Opaque Token の scope は通常 `SCOPE_` から始まる authority へ変換されます。必要な scope は `hasAuthority("SCOPE_reports.read")` などの認可ルールで要求します。認証方式を複数追加しただけでは MFA にはならないため、保護対象ごとに必要な factor を認可ルールへ設定します。
 
 Controller で現在の利用者名だけが必要な場合は `Principal`、権限を含む認証情報が必要な場合は `Authentication`、独自の principal を受け取る場合は `@AuthenticationPrincipal` を利用できます。
 
@@ -217,7 +225,9 @@ class ReportService {
 }
 ~~~
 
-メソッド認可は、別の Controller、バッチ処理、またはほかの Bean からサービスが呼ばれた場合にも適用できます。URL 認可を削除する代わりではなく、入口と業務処理を多層で保護するために使います。現在のプロジェクトでは有効化していません。
+メソッド認可は、別の Controller、バッチ処理、またはほかの Bean からサービスが呼ばれた場合にも適用できます。URL 認可を削除する代わりではなく、入口と業務処理を多層で保護するために使います。
+
+メソッド認可は Spring AOP の proxy を通る呼び出しに適用されます。同じ Bean 内から対象メソッドを直接呼ぶ self-invocation では認可が実行されないため、認可境界となる処理を別の Bean に分けてください。現在のプロジェクトではメソッド認可を有効化していません。
 
 ### `401`、`403`、リダイレクトの違い
 
@@ -242,6 +252,8 @@ CSRF 保護は既定で有効です。`POST`、`PUT`、`PATCH`、`DELETE` など
 
 CSRF を無効化または対象外にするのは、ブラウザーが資格情報を自動送信しない Bearer Token 専用 API など、不要である根拠を確認できる範囲に限定します。現在の API は HTTP Basic を使用しているため CSRF を有効なままにしています。現時点では読み取り専用の `GET` だけなので Token は要求されません。
 
+既定の `HttpSessionCsrfTokenRepository` は CSRF Token を `HttpSession` に保存します。このため、将来 Basic 認証の API に状態変更メソッドを追加すると、`SessionCreationPolicy.STATELESS` でも CSRF Token のためにセッションが作られる場合があります。クライアントが Token を取得・送信する手順と `CsrfTokenRepository` を含めて設計してください。
+
 ### CORS
 
 CORS は、どのオリジンのブラウザー JavaScript にレスポンスの読み取りを許可するかを制御する仕組みです。認証や CSRF 対策の代わりにはなりません。現在のプロジェクトは同一オリジンで画面と API を利用するため、CORS を構成していません。
@@ -264,7 +276,7 @@ UrlBasedCorsConfigurationSource corsConfigurationSource() {
 }
 ~~~
 
-資格情報を許可する CORS 設定では、許可オリジンを無制限にしないでください。複数の `SecurityFilterChain` で異なる CORS ポリシーが必要な場合は、それぞれの `.cors(...)` に対応する `CorsConfigurationSource` を指定します。
+`setAllowCredentials(true)` は、Cookie や HTTP 認証をオリジン間で送る必要がある場合だけ指定します。その場合は許可オリジンを無制限にせず、CSRF Token の送信方法も設計してください。クロスサイトで Cookie を送る必要がある場合は、`SameSite=None` と `Secure` の設定も確認します。複数の `SecurityFilterChain` で異なる CORS ポリシーが必要な場合は、それぞれの `.cors(...)` に対応する `CorsConfigurationSource` を指定します。
 
 ### セキュリティ用 HTTP レスポンスヘッダー
 
@@ -290,7 +302,7 @@ Content Security Policy（CSP）はアプリケーションごとに許可する
 
 `STATELESS` は Spring Security が Security Context のためにセッションを作成・参照しない設定です。Controller などのアプリケーションコードが `HttpSession` を明示的に作ることまで禁止する設定ではありません。
 
-本番では Cookie の `Secure`、`HttpOnly`、`SameSite`、有効期間、適用 Path を確認します。同時ログイン数を制限する場合は同時セッション制御を追加し、複数インスタンスと Spring Session を含む構成で失効が正しく共有されることをテストしてください。
+本番では Cookie の `Secure`、`HttpOnly`、`SameSite`、有効期間、適用 Path を確認します。同時ログイン数を制限する場合、標準のインメモリ `SessionRegistry` だけでは制限が JVM ごとに分かれます。複数インスタンス全体で制限するには、Spring Session の indexed repository と `SpringSessionBackedSessionRegistry` などを構成し、失効が正しく共有されることをテストしてください。
 
 `logout(withDefaults())` により、Spring Security はログアウトを処理します。CSRF が有効な場合、実際のログアウトは CSRF Token を含む `POST /logout` で行います。既定ではセッションを無効化し、`SecurityContext` と CSRF Token を消去して、`/login?logout` へリダイレクトします。
 
@@ -336,24 +348,29 @@ curl --include http://localhost:8080/api/private
 curl --fail-with-body --user user:password http://localhost:8080/api/private
 ~~~
 
-成功時の JSON には認証済みユーザー名が含まれます。公開 API、認証成功、認証失敗のいずれでも API 用チェーンは `SESSION` Cookie を作成しません。
+成功時の JSON には認証済みユーザー名が含まれます。現在テストしている `GET` の公開 API、認証成功、認証失敗では、API 用チェーンは `SESSION` Cookie を作成しません。状態変更 API と CSRF Token を追加した場合は、CSRF Token の保存方式に応じてこの前提を見直します。
 
 ## 10. 本番設定と運用
 
-本番用 JAR を作成し、PostgreSQL、Valkey、初期ユーザーの値を環境変数で渡します。
+本番用 JAR を作成し、PostgreSQL、Valkey、初期ユーザーの値をデプロイ基盤の環境変数で渡します。
 
 ~~~bash
 ./gradlew bootJar
 
-DATABASE_URL='jdbc:postgresql://postgres.example.com:5432/app' \
-DATABASE_USERNAME='app' \
-DATABASE_PASSWORD='database-secret' \
-VALKEY_URL='rediss://user:valkey-secret@valkey.example.com:6379/0' \
-APP_INITIAL_USER_USERNAME='admin' \
-APP_INITIAL_USER_PASSWORD='application-secret' \
-  java -jar build/libs/spring-boot-dev-tooling-lab-0.0.1-SNAPSHOT.jar \
+java -jar build/libs/spring-boot-dev-tooling-lab-0.0.1-SNAPSHOT.jar \
   --spring.profiles.active=production
 ~~~
+
+起動前にデプロイ基盤から次の環境変数を注入します。
+
+| 環境変数 | 内容 |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL の JDBC URL |
+| `DATABASE_USERNAME` | PostgreSQL のユーザー名 |
+| `DATABASE_PASSWORD` | PostgreSQL のパスワード |
+| `VALKEY_URL` | 認証情報と必要に応じて TLS を含む Valkey URL。TLS 接続では `rediss://` を使用する |
+| `APP_INITIAL_USER_USERNAME` | 初期ユーザー名 |
+| `APP_INITIAL_USER_PASSWORD` | 初期ユーザーのパスワード |
 
 `production` プロファイルでは、上記の環境変数に既定値を設けていません。実環境ではデプロイ基盤の Secret 管理機能から値を注入し、シェル履歴、ログ、構成ファイル、コンテナイメージへ秘密情報を残さないでください。
 
@@ -381,7 +398,7 @@ Docker を起動した状態で実行します。
 ./gradlew test
 ~~~
 
-現在の統合テストは、次を確認します。
+現在のテストは、次を確認します。
 
 - 未認証の画面がログインページへリダイレクトされる
 - PostgreSQL 上のユーザーでフォームログインでき、Security Context が Valkey に保存される
@@ -430,7 +447,7 @@ Spring Security の MockMvc 支援では、次をよく使用します。
 | `POST /logout` が `403` になる | POST フォームまたはリクエストヘッダーに正しい CSRF Token があるか確認する |
 | CSS がログイン画面へリダイレクトされる | 静的リソースの URL を `permitAll()` に含め、`anyRequest()` より前に記述しているか確認する |
 | CORS preflight が `401` / `403` になる | 対象チェーンで CORS を有効にし、許可オリジン、メソッド、ヘッダー、`OPTIONS` の処理を確認する |
-| API で `SESSION` Cookie が作られる | 対象リクエストが API チェーンに一致するか、アプリケーションコードが `HttpSession` を作っていないか確認する |
+| API で `SESSION` Cookie が作られる | 対象リクエストが API チェーンに一致するか、アプリケーションコードまたは CSRF Token の保存処理が `HttpSession` を作っていないか確認する |
 | 環境変数を変えてもパスワードが変わらない | 初期化処理は既存ユーザーを更新しないため、管理手順でパスワードを変更する |
 | Actuator がログイン画面へ移動する | 現在は画面用 catch-all の認証対象。専用チェーンを設ける場合も公開範囲を限定する |
 
@@ -452,5 +469,9 @@ Spring Security の MockMvc 支援では、次をよく使用します。
 - [セキュリティ用 HTTP レスポンスヘッダー](https://docs.spring.io/spring-security/reference/servlet/exploits/headers.html)
 - [OAuth 2.0](https://docs.spring.io/spring-security/reference/servlet/oauth2/)
 - [OAuth 2.0 Resource Server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/index.html)
+- [JWT Resource Server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html)
+- [Opaque Token Resource Server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/opaque-token.html)
 - [MockMvc によるテスト](https://docs.spring.io/spring-security/reference/servlet/test/mockmvc/)
 - [多要素認証](https://docs.spring.io/spring-security/reference/servlet/authentication/mfa.html)
+- [One-Time Token ログイン](https://docs.spring.io/spring-security/reference/servlet/authentication/onetimetoken.html)
+- [Spring Session と Spring Security の連携](https://docs.spring.io/spring-session/reference/spring-security.html)
