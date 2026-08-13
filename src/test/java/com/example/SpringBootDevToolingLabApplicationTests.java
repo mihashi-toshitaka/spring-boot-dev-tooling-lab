@@ -12,8 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
@@ -30,6 +32,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.session.SessionRepository;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -58,6 +62,12 @@ class SpringBootDevToolingLabApplicationTests {
 
     @Autowired
     private SessionRepository<?> sessionRepository;
+
+    @Autowired
+    private JdbcUserDetailsManager users;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Value("${spring.session.data.redis.namespace}")
     private String sessionNamespace;
@@ -90,13 +100,73 @@ class SpringBootDevToolingLabApplicationTests {
     }
 
     @Test
-    void redirectsProtectedPageToDefaultLoginPage() throws Exception {
+    void redirectsProtectedPageToCustomLoginPage() throws Exception {
         mockMvc.perform(get("/greeting")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login"));
 
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
+                .andExpect(view().name("login"))
+                .andExpect(content().string(containsString("SPRING SECURITY")))
                 .andExpect(content().string(containsString("name=\"username\"")))
-                .andExpect(content().string(containsString("name=\"password\"")));
+                .andExpect(content().string(containsString("name=\"password\"")))
+                .andExpect(content().string(containsString("href=\"/signup\"")));
+
+        mockMvc.perform(get("/signup"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("signup"))
+                .andExpect(content().string(containsString("このサイトはテスト用です。")))
+                .andExpect(content().string(containsString("個人情報は入力しないでください")));
+    }
+
+    @Test
+    void displaysValidationErrorsWithoutCreatingAccount() throws Exception {
+        String username = "invalid account";
+
+        mockMvc.perform(post("/signup")
+                        .with(csrf())
+                        .param("username", username)
+                        .param("password", "short")
+                        .param("passwordConfirmation", "different"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("signup"))
+                .andExpect(model().attributeExists("errors"))
+                .andExpect(content().string(containsString("ユーザー名には半角英数字")))
+                .andExpect(content().string(containsString("パスワードは8文字以上")))
+                .andExpect(content().string(containsString("確認用パスワードが一致しません")));
+
+        assertThat(users.userExists(username)).isFalse();
+    }
+
+    @Test
+    void registersAccountWithEncodedPasswordAndAllowsLogin() throws Exception {
+        String username = "new-user";
+        String password = "new-password";
+
+        try {
+            mockMvc.perform(post("/signup")
+                            .with(csrf())
+                            .param("username", username)
+                            .param("password", password)
+                            .param("passwordConfirmation", password))
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(redirectedUrl("/login?registered"));
+
+            assertThat(users.userExists(username)).isTrue();
+            assertThat(passwordEncoder.matches(
+                            password, users.loadUserByUsername(username).getPassword()))
+                    .isTrue();
+            assertThat(users.loadUserByUsername(username).getAuthorities())
+                    .extracting("authority")
+                    .containsExactly("ROLE_USER");
+
+            mockMvc.perform(formLogin().user(username).password(password))
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(redirectedUrl("/"));
+        } finally {
+            if (users.userExists(username)) {
+                users.deleteUser(username);
+            }
+        }
     }
 
     @Test

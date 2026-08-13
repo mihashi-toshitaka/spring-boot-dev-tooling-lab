@@ -154,11 +154,17 @@ sudo apt install -y python3 python3-pip
 
 各ツールの役割分担と推奨実行順は、[コード品質ツールガイド](docs/code-quality-tools.md) にまとめています。
 
+開発を支える周辺ツールについては、次のガイドを参照してください。
+
+- [Flyway 主要機能ガイド](docs/ecosystem/flyway-guide.md)
+- [Testcontainers ガイド](docs/ecosystem/testcontainers-guide.md)
+
 Spring Boot の各種機能については、次のガイドを参照してください。
 
 - [Spring Boot DevTools ガイド](docs/spring-ecosystem/spring-boot-devtools-guide.md)
 - [Spring Boot Actuator ガイド](docs/spring-ecosystem/spring-boot-actuator-guide.md)
 - [Spring Boot Configuration Processor ガイド](docs/spring-ecosystem/spring-boot-configuration-processor-guide.md)
+- [Spring Boot Flyway ガイド](docs/spring-ecosystem/spring-boot-flyway-guide.md)
 - [Spring Boot Thymeleaf ガイド](docs/spring-ecosystem/spring-boot-thymeleaf-guide.md)
 - [Spring Security ガイド](docs/spring-ecosystem/spring-security-guide.md)
 - [Spring Session + Valkey ガイド](docs/spring-ecosystem/spring-session-valkey-guide.md)

@@ -37,11 +37,11 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/css/**", "/error")
+                        .requestMatchers("/css/**", "/error", "/login", "/signup")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
-                .formLogin(withDefaults())
+                .formLogin(form -> form.loginPage("/login").permitAll())
                 .logout(withDefaults());
         return http.build();
     }

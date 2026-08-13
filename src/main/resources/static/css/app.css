@@ -137,6 +137,131 @@ footer {
     font-size: 0.9rem;
 }
 
+.auth-shell {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    width: min(100%, 30rem);
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border: 1px solid rgb(23 51 44 / 12%);
+    border-radius: 1.5rem;
+    background: rgb(255 255 255 / 84%);
+    box-shadow: 0 1.5rem 4rem rgb(23 51 44 / 12%);
+    backdrop-filter: blur(0.75rem);
+}
+
+.auth-card h1 {
+    margin-bottom: 1rem;
+    font-size: clamp(2.25rem, 10vw, 3.75rem);
+}
+
+.auth-description {
+    margin-bottom: 2rem;
+    color: #526c64;
+    line-height: 1.7;
+}
+
+.auth-form,
+.form-field {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.auth-form {
+    gap: 1.35rem;
+}
+
+.form-field label {
+    font-weight: 700;
+}
+
+.form-field input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1px solid #9cb5ac;
+    border-radius: 0.7rem;
+    color: #17332c;
+    background: #fff;
+    font: inherit;
+}
+
+.form-field input:focus {
+    border-color: #367d4a;
+    outline: 3px solid rgb(79 159 98 / 20%);
+}
+
+.form-field input[aria-invalid="true"] {
+    border-color: #a53b3b;
+}
+
+.field-hint,
+.field-error {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.field-hint {
+    color: #657c75;
+}
+
+.field-error {
+    color: #8f2929;
+    font-weight: 700;
+}
+
+.primary-button {
+    padding: 0.9rem 1.2rem;
+    border: 0;
+    border-radius: 0.75rem;
+    color: #fff;
+    background: #367d4a;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    background: #29683b;
+}
+
+.notice {
+    margin-bottom: 1.5rem;
+    padding: 0.85rem 1rem;
+    border-radius: 0.7rem;
+    line-height: 1.6;
+}
+
+.notice-error {
+    color: #782121;
+    background: #fae4e4;
+}
+
+.notice-success {
+    color: #245d35;
+    background: #e0f1e4;
+}
+
+.notice-warning {
+    color: #6b4b16;
+    background: #fff0c7;
+}
+
+.auth-navigation {
+    margin: 1.75rem 0 0;
+    color: #526c64;
+    text-align: center;
+}
+
+.auth-navigation a {
+    color: #29683b;
+    font-weight: 800;
+}
+
 @media (max-width: 48rem) {
     .page-shell {
         padding-top: 4rem;

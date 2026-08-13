@@ -64,10 +64,10 @@ Servlet アプリケーションでは、Spring Security は Controller より�
 | --- | --- | --- |
 | `GET /api/public` | 認証不要 | ステートレス |
 | `GET /api/private` | HTTP Basic による認証が必要 | ステートレス |
-| `/css/**`、`/error` | 認証不要 | `HttpSession`（必要な場合のみ） |
+| `/css/**`、`/error`、`/login`、`/signup` | 認証不要 | `HttpSession`（必要な場合のみ） |
 | `/greeting` など上記以外 | フォームログインによる認証が必要 | `HttpSession` を Valkey に保存 |
 
-`/login` と `/logout` は Spring Security の Filter が提供する認証用のエンドポイントです。上表の「上記以外」には、これらの認証処理用エンドポイントを含めません。
+`GET /login` は Controller が独自画面を表示し、`POST /login` と `/logout` は Spring Security の Filter が認証・ログアウトを処理します。`/signup` は Controller と `UserRegistrationService` が入力検証とユーザー作成を担当します。
 
 設定の中心は `SecurityConfiguration.java` です。
 
@@ -90,11 +90,11 @@ SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
 @Bean
 SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
     http.authorizeHttpRequests(authorize -> authorize
-                    .requestMatchers("/css/**", "/error")
+                    .requestMatchers("/css/**", "/error", "/login", "/signup")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
-            .formLogin(withDefaults())
+            .formLogin(form -> form.loginPage("/login").permitAll())
             .logout(withDefaults());
     return http.build();
 }
@@ -117,9 +117,9 @@ SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
 
 ### フォームログイン
 
-画面用チェーンの `formLogin(withDefaults())` は、未認証のブラウザーを `/login` へリダイレクトし、既定のログイン画面を表示します。認証成功後の `SecurityContext` は `HttpSession` に入り、このプロジェクトでは Spring Session を通して Valkey に保存されます。
+画面用チェーンの `formLogin(form -> form.loginPage("/login").permitAll())` は、未認証のブラウザーを独自の `/login` 画面へリダイレクトします。画面のフォームは `POST /login` へユーザー名とパスワードを送り、認証処理自体は Spring Security に任せます。認証成功後の `SecurityContext` は `HttpSession` に入り、このプロジェクトでは Spring Session を通して Valkey に保存されます。
 
-独自のログイン画面が必要になった場合は `loginPage(...)`、成功時の遷移は `defaultSuccessUrl(...)` または `AuthenticationSuccessHandler`、失敗時の処理は `AuthenticationFailureHandler` で構成できます。画面やエラー表示を変更しても、資格情報をログへ出力しないでください。
+成功時の遷移を変更する場合は `defaultSuccessUrl(...)` または `AuthenticationSuccessHandler`、失敗時の処理を変更する場合は `AuthenticationFailureHandler` で構成できます。画面やエラー表示を変更しても、資格情報をログへ出力しないでください。
 
 ### HTTP Basic
 
@@ -164,6 +164,8 @@ PasswordEncoder passwordEncoder() {
 `DelegatingPasswordEncoder` の保存形式は `{id}encodedPassword` です。現在の encode の既定は bcrypt であるため、このプロジェクトで新規作成するパスワードは `{bcrypt}` から始まります。`{bcrypt}` を手動で連結せず、必ず `PasswordEncoder#encode` の結果全体を保存してください。
 
 `roles("USER")` は `ROLE_USER` という authority を作成します。データベースの `authorities.authority` にも `ROLE_USER` が保存されます。
+
+アカウント作成画面は `UserRegistrationService` から `JdbcUserDetailsManager#createUser` を呼び出します。パスワードは Controller や SQL で直接保存せず、既存の `PasswordEncoder` でエンコードします。登録処理はトランザクション内でユーザーと authority をまとめて保存します。
 
 パスワードを扱うときは次を守ります。
 

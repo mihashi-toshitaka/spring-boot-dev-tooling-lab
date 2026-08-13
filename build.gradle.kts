@@ -57,25 +57,37 @@ spotbugs {
 }
 
 dependencies {
+    // Web・テンプレートエンジン
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
+    // 運用監視
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    // データベース・マイグレーション
     implementation("org.springframework.boot:spring-boot-starter-flyway")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-session-data-redis")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
+
+    // 認証・セッション管理
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-session-data-redis")
+
+    // 開発支援
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+    // テスト
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:testcontainers-postgresql")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.2")
+
+    // 静的解析・リファクタリング
     compileOnly("com.google.errorprone:error_prone_annotations:2.50.0")
     errorprone("com.google.errorprone:error_prone_core:2.50.0")
     rewrite("org.openrewrite.recipe:rewrite-spring:6.34.0")
