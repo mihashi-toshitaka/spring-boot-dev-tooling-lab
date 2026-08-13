@@ -86,6 +86,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers-postgresql")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.2")
+    testImplementation("com.microsoft.playwright:playwright:1.61.0")
 
     // 静的解析・リファクタリング
     compileOnly("com.google.errorprone:error_prone_annotations:2.50.0")
@@ -99,8 +100,46 @@ tasks.withType<JavaCompile>().configureEach {
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+tasks.named<Test>("test") {
+    useJUnitPlatform {
+        excludeTags("playwright")
+    }
+}
+
+val playwrightInstall by tasks.registering(JavaExec::class) {
+    group = "playwright"
+    description = "Playwright が使用する Chromium をインストールします。"
+    classpath = sourceSets.test.get().runtimeClasspath
+    mainClass = "com.microsoft.playwright.CLI"
+    args("install", "chromium")
+}
+
+tasks.register<JavaExec>("playwrightInstallWithDeps") {
+    group = "playwright"
+    description = "Chromium と実行に必要な OS パッケージをインストールします。"
+    classpath = sourceSets.test.get().runtimeClasspath
+    mainClass = "com.microsoft.playwright.CLI"
+    args("install", "--with-deps", "chromium")
+}
+
+val playwrightTest by tasks.registering(Test::class) {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    description = "Playwright によるブラウザ E2E テストを実行します。"
+    dependsOn(playwrightInstall)
+    testClassesDirs =
+        sourceSets.test
+            .get()
+            .output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    environment("PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD", "1")
+    useJUnitPlatform {
+        includeTags("playwright")
+    }
+    shouldRunAfter(tasks.test)
+}
+
+tasks.check {
+    dependsOn(playwrightTest)
 }
 
 tasks.withType<SpotBugsTask>().configureEach {

@@ -151,6 +151,7 @@ sudo apt install -y python3 python3-pip
 | **OpenRewrite** | Java / Spring の移行や静的なコード変換を自動化する | [OpenRewrite ガイド](docs/openrewrite-guide.md)、./gradlew rewriteDryRun、./gradlew rewriteRun |
 | **Error Prone** | Java のコンパイル時に潜在的なバグパターンを検出する | [Error Prone ガイド](docs/error-prone-guide.md)、./gradlew compileJava または ./gradlew check |
 | **ArchUnit** | クラス構成やアーキテクチャ上のルールをテストとして検査する | [ArchUnit ガイド](docs/archunit-guide.md)、./gradlew test または ./gradlew check |
+| **Playwright** | Chromium を操作して実際の画面遷移を E2E テストする | [Playwright ガイド](docs/testing/playwright-guide.md)、./gradlew playwrightTest または ./gradlew check |
 
 各ツールの役割分担と推奨実行順は、[コード品質ツールガイド](docs/code-quality-tools.md) にまとめています。
 
@@ -158,6 +159,7 @@ sudo apt install -y python3 python3-pip
 
 - [Flyway 主要機能ガイド](docs/ecosystem/flyway-guide.md)
 - [Testcontainers ガイド](docs/ecosystem/testcontainers-guide.md)
+- [Playwright ガイド](docs/testing/playwright-guide.md)
 
 Spring Boot の各種機能については、次のガイドを参照してください。
 
