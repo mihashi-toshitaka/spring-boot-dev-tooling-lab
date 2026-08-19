@@ -123,7 +123,31 @@ source ~/.bashrc
 nvm install --lts
 ~~~
 
-### 4. Python 3
+### 4. npx skills
+
+`npx skills` は、Codex などの AI コーディングエージェントで利用する Agent Skills を検索、追加、更新するための CLI です。前節の手順で Node.js と npm をインストールすると、`npx` も利用できるようになります。`skills` パッケージをグローバルにインストールする必要はありません。
+
+最初に `npx` が利用できることを確認します。
+
+~~~bash
+npx --version
+~~~
+
+次のコマンドを実行すると、`skills` パッケージが未取得の場合は npm のキャッシュへダウンロードされ、CLI が起動します。インストール確認が表示された場合は、パッケージ名が `skills` であることを確認して続行してください。
+
+~~~bash
+npx skills --help
+~~~
+
+このプロジェクトへ Codex 用の Skill を追加する基本形は次のとおりです。`<owner>/<repository>` は、利用する Skill を公開している GitHub リポジトリに置き換えます。
+
+~~~bash
+npx skills add <owner>/<repository> --agent codex
+~~~
+
+追加元のリポジトリには、AI エージェントへの指示や補助スクリプトが含まれる場合があります。実行前に提供元と `SKILL.md` の内容を確認してください。詳しいコマンド、配置先、更新方法については、[npx skills ガイド](docs/agent-plugins/npx-skills-guide.md)を参照してください。
+
+### 5. Python 3
 
 インストール済みかどうかは、次のコマンドで確認できます。
 

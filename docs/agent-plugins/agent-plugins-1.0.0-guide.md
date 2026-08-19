@@ -326,7 +326,10 @@ Agent Plugins は、一つの局所的な問題で独立したコンポーネン
 
 ~~~text
 spring-boot-dev-tooling-lab/
+├── .codex/
+│   └── config.toml
 ├── AGENTS.md
+├── mcp.json
 ├── plugin.json
 ├── skills/
 │   └── fix-sonarlint-issues/
@@ -334,13 +337,18 @@ spring-boot-dev-tooling-lab/
 └── docs/
     └── agent-plugins/
         ├── agent-plugins-1.0.0-guide.md
+        ├── codex-ide-mcp-guide.md
+        ├── mcp/
+        │   └── context7-mcp-guide.md
         └── agents-md-guide.md
 ~~~
 
 - [`AGENTS.md`](../../AGENTS.md) は Codex へリポジトリ内の作業方針を伝えるクライアント固有ファイルであり、Agent Plugins 1.0.0 のポータブルコンポーネントではありません。詳細は [AGENTS.md ガイド](agents-md-guide.md)を参照してください。
+- [`.codex/config.toml`](../../.codex/config.toml) は、Codex CLI と Codex IDE 拡張が Context7 へ接続するためのクライアント固有設定です。
+- [`mcp.json`](../../mcp.json) は、Context7 の Streamable HTTP 接続を定義する Agent Plugins 1.0.0 のポータブルコンポーネントです。
 - [`plugin.json`](../../plugin.json) は Agent Plugins 1.0.0 の正規 `$schema` とプラグインメタデータを定義します。
 - [`fix-sonarlint-issues/SKILL.md`](../../skills/fix-sonarlint-issues/SKILL.md) は、SonarLint が表示した指摘を調査し、安全に修正して回帰確認する手順を提供します。
-- MCP サーバー実装がないため、`mcp.json` は作成していません。
+- [Context7 MCP ガイド](mcp/context7-mcp-guide.md) は、本プロジェクトでの設定、利用、検証、更新方法を説明します。
 - `docs/` は利用者向け資料であり、ポータブルコンポーネントとして自動発見されるディレクトリではありません。
 
 ## 10. 作成と検証の手順
@@ -471,3 +479,5 @@ Agent Plugins はクライアントによる段階的な対応を許可してい
 - [Agent Plugins 1.0.0 MCP schema](https://agent-plugins.org/schemas/1.0.0/mcp.schema.json)
 - [Agent Skills Specification](https://agentskills.io/specification)
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/specification/latest)
+- [Codex IDE 拡張の MCP 管理ガイド](codex-ide-mcp-guide.md)
+- [Context7 MCP ガイド](mcp/context7-mcp-guide.md)

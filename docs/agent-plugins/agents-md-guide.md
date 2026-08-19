@@ -41,7 +41,10 @@ Agent Plugins 1.0.0 が標準化するポータブルなコンポーネントは
 
 ~~~text
 spring-boot-dev-tooling-lab/
+├── .codex/
+│   └── config.toml
 ├── AGENTS.md
+├── mcp.json
 ├── plugin.json
 ├── skills/
 │   └── fix-sonarlint-issues/
@@ -51,6 +54,9 @@ spring-boot-dev-tooling-lab/
 └── docs/
     └── agent-plugins/
         ├── agent-plugins-1.0.0-guide.md
+        ├── codex-ide-mcp-guide.md
+        ├── mcp/
+        │   └── context7-mcp-guide.md
         └── agents-md-guide.md
 ~~~
 
@@ -198,4 +204,6 @@ Skill と重複する内容は、役割で分けます。リポジトリ内の�
 
 - [OpenAI Docs: Custom instructions with AGENTS.md](https://developers.openai.com/codex/guides/agents-md)
 - [Agent Plugins 1.0.0 標準化ガイド](agent-plugins-1.0.0-guide.md)
+- [Codex IDE 拡張の MCP 管理ガイド](codex-ide-mcp-guide.md)
+- [Context7 MCP ガイド](mcp/context7-mcp-guide.md)
 - [本プロジェクトの AGENTS.md](../../AGENTS.md)
