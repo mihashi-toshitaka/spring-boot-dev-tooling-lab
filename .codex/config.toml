@@ -19,8 +19,13 @@ exec uvx \
     https://docs.oracle.com/ \
     https://docs.spring.io/ \
     https://documentation.red-gate.com/ \
+    https://www.postgresql.org/ \
+    https://valkey.io/ \
+    https://www.jooq.org/ \
     https://java.testcontainers.org/ \
     https://playwright.dev/ \
+    https://docs.junit.org/ \
+    https://www.thymeleaf.org/ \
   --follow-redirects \
   --timeout 15 \
   --transport stdio

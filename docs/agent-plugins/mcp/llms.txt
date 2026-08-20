@@ -11,6 +11,14 @@
 - [Spring Boot 4.1 reference](https://docs.spring.io/spring-boot/4.1/reference/)
 - [Spring Security 7.1 reference](https://docs.spring.io/spring-security/reference/7.1/index.html)
 - [Spring Session 4.1 reference](https://docs.spring.io/spring-session/reference/4.1/index.html)
+- [Spring Data Redis 4.1 reference](https://docs.spring.io/spring-data/redis/reference/)
+
+## Data stores
+
+- [PostgreSQL 17 documentation](https://www.postgresql.org/docs/17/)
+- [Valkey documentation](https://valkey.io/docs/)
+- [Valkey 8.1 releases](https://valkey.io/download/releases/#81x)
+- [jOOQ 3.21 user manual](https://www.jooq.org/doc/3.21/manual/)
 
 ## Database migration
 
@@ -18,5 +26,10 @@
 
 ## Testing
 
+- [JUnit 6.0.3 user guide](https://docs.junit.org/6.0.3/)
 - [Testcontainers for Java](https://java.testcontainers.org/)
 - [Playwright for Java](https://playwright.dev/java/docs/intro)
+
+## Web
+
+- [Thymeleaf 3.1 and Spring tutorial](https://www.thymeleaf.org/doc/tutorials/3.1/thymeleafspring.html)

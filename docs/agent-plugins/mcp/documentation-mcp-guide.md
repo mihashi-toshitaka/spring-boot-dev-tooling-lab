@@ -63,9 +63,19 @@ docker version
 - Spring Boot 4.1
 - Spring Security 7.1
 - Spring Session 4.1
+- Spring Data Redis 4.1
+- PostgreSQL 17
+- Valkey 8.1
+- jOOQ 3.21
+- Thymeleaf 3.1
+- JUnit 6.0.3
 - Flyway
 - Testcontainers for Java
 - Playwright for Java
+
+Spring Boot 4.1.0が管理するjOOQ 3.21.5に合わせ、jOOQの3.21系公式マニュアルを登録しています。
+
+Valkeyの公式Webドキュメントはバージョン別URLを提供していないため、一般ドキュメントと8.1系リリース一覧を登録しています。8.1固有の実装や挙動を確定するときは、GitHub MCPで対応するタグも確認します。
 
 公式に `llms.txt` が公開されている次のサイトは、ローカル索引を経由せずmcpdocへ直接登録しています。
 
@@ -81,8 +91,13 @@ docker version
 - `https://docs.oracle.com/`
 - `https://docs.spring.io/`
 - `https://documentation.red-gate.com/`
+- `https://www.postgresql.org/`
+- `https://valkey.io/`
+- `https://www.jooq.org/`
 - `https://java.testcontainers.org/`
 - `https://playwright.dev/`
+- `https://docs.junit.org/`
+- `https://www.thymeleaf.org/`
 
 `*`による全ドメイン許可は使用しません。新しいドキュメントを索引へ追加するときは、提供元が公式サイトであることを確認し、必要なドメインだけを両方のMCP設定へ追加します。
 
