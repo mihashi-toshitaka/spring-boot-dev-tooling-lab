@@ -1,0 +1,22 @@
+# Spring Boot Dev Tooling Lab documentation
+
+> このプロジェクトで使用する主要技術の公式ドキュメント索引です。バージョンは `build.gradle.kts` と Gradle Wrapper に合わせています。
+
+## Java
+
+- [Java SE 21 and JDK 21 API specification](https://docs.oracle.com/en/java/javase/21/docs/api/)
+
+## Spring
+
+- [Spring Boot 4.1 reference](https://docs.spring.io/spring-boot/4.1/reference/)
+- [Spring Security 7.1 reference](https://docs.spring.io/spring-security/reference/7.1/index.html)
+- [Spring Session 4.1 reference](https://docs.spring.io/spring-session/reference/4.1/index.html)
+
+## Database migration
+
+- [Redgate Flyway documentation](https://documentation.red-gate.com/flyway)
+
+## Testing
+
+- [Testcontainers for Java](https://java.testcontainers.org/)
+- [Playwright for Java](https://playwright.dev/java/docs/intro)

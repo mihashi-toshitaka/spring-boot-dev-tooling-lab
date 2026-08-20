@@ -56,7 +56,8 @@ spring-boot-dev-tooling-lab/
         ├── agent-plugins-1.0.0-guide.md
         ├── codex-ide-mcp-guide.md
         ├── mcp/
-        │   └── context7-mcp-guide.md
+        │   ├── documentation-mcp-guide.md
+        │   └── llms.txt
         └── agents-md-guide.md
 ~~~
 
@@ -205,5 +206,5 @@ Skill と重複する内容は、役割で分けます。リポジトリ内の�
 - [OpenAI Docs: Custom instructions with AGENTS.md](https://developers.openai.com/codex/guides/agents-md)
 - [Agent Plugins 1.0.0 標準化ガイド](agent-plugins-1.0.0-guide.md)
 - [Codex IDE 拡張の MCP 管理ガイド](codex-ide-mcp-guide.md)
-- [Context7 MCP ガイド](mcp/context7-mcp-guide.md)
+- [ドキュメント MCP ガイド](mcp/documentation-mcp-guide.md)
 - [本プロジェクトの AGENTS.md](../../AGENTS.md)

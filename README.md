@@ -162,6 +162,26 @@ sudo apt update
 sudo apt install -y python3 python3-pip
 ~~~
 
+### 6. ドキュメント MCP の前提コマンド
+
+このプロジェクトは、公式ドキュメントを取得する mcpdoc、公開リポジトリを説明する DeepWiki、GitHub 上のソースコードを確認する GitHub MCP を使用します。詳しい役割分担と設定は、[ドキュメント MCP ガイド](docs/agent-plugins/mcp/documentation-mcp-guide.md)を参照してください。
+
+mcpdoc は `uvx` から起動します。`uv` が未インストールの場合は、[uv の公式手順](https://docs.astral.sh/uv/getting-started/installation/)に従ってインストールします。
+
+~~~bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source ~/.bashrc
+uvx --version
+~~~
+
+GitHub MCP は Docker コンテナとして起動します。WSL2 から `docker` を利用できない場合は、[Docker Desktop の WSL 2 バックエンド](https://docs.docker.com/desktop/features/wsl/)を設定してください。
+
+~~~bash
+docker version
+~~~
+
+GitHub MCP の初回利用時には GitHub アカウントによる OAuth 認証が必要です。PAT やアクセストークンをこのリポジトリの設定ファイルへ記述する必要はありません。
+
 ## 利用開発用ツール
 
 このプロジェクトでは、主に Gradle の check タスクを入口として、コード品質チェック、フォーマット、ソースコード変換、コンパイル時解析を行います。

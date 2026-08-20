@@ -1,9 +1,61 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
-    "context7-project": {
+    "mcpdoc-project": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "mcpdoc==0.0.10",
+        "--with",
+        "mcp==1.28.0",
+        "mcpdoc",
+        "--urls",
+        "Project:${PLUGIN_ROOT}/docs/agent-plugins/mcp/llms.txt",
+        "Gradle:https://docs.gradle.org/llms.txt",
+        "OpenAI:https://developers.openai.com/llms.txt",
+        "MCP:https://modelcontextprotocol.io/llms.txt",
+        "GitHub:https://docs.github.com/llms.txt",
+        "--allowed-domains",
+        "https://docs.oracle.com/",
+        "https://docs.spring.io/",
+        "https://documentation.red-gate.com/",
+        "https://java.testcontainers.org/",
+        "https://playwright.dev/",
+        "--follow-redirects",
+        "--timeout",
+        "15",
+        "--transport",
+        "stdio"
+      ],
+      "cwd": "${PLUGIN_ROOT}"
+    },
+    "deepwiki-project": {
       "type": "streamable-http",
-      "url": "https://mcp.context7.com/mcp"
+      "url": "https://mcp.deepwiki.com/mcp"
+    },
+    "github-project": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-p",
+        "127.0.0.1:8085:8085",
+        "-e",
+        "GITHUB_OAUTH_CALLBACK_PORT",
+        "-e",
+        "GITHUB_READ_ONLY",
+        "-e",
+        "GITHUB_TOOLSETS",
+        "ghcr.io/github/github-mcp-server:v1.10.0"
+      ],
+      "env": {
+        "GITHUB_OAUTH_CALLBACK_PORT": "8085",
+        "GITHUB_READ_ONLY": "1",
+        "GITHUB_TOOLSETS": "repos"
+      }
     }
   }
 }

@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "spring-boot-dev-tooling-lab",
-  "version": "1.1.0",
-  "description": "Use Context7 documentation, fix SonarLint issues in Spring Boot projects, and verify changes with the Gradle Wrapper.",
+  "version": "1.2.0",
+  "description": "Use mcpdoc, DeepWiki, and GitHub MCP to verify documentation and source code, fix SonarLint issues, and validate changes with the Gradle Wrapper.",
   "repository": "https://github.com/mihashi-toshitaka/spring-boot-dev-tooling-lab",
   "keywords": [
     "spring-boot",
@@ -11,7 +11,9 @@
     "sonarlint",
     "development-tooling",
     "code-quality",
-    "context7",
+    "mcpdoc",
+    "deepwiki",
+    "github",
     "mcp"
   ]
 }

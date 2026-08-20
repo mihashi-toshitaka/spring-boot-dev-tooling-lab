@@ -23,7 +23,8 @@ spring-boot-dev-tooling-lab/
     └── agent-plugins/
         ├── codex-ide-mcp-guide.md
         └── mcp/
-            └── context7-mcp-guide.md
+            ├── documentation-mcp-guide.md
+            └── llms.txt
 ~~~
 
 ## 2. 推奨する管理手順
@@ -104,69 +105,85 @@ required = false
 
 Agent Plugins の `${PLUGIN_ROOT}` や `${PLUGIN_DATA}` は Agent Plugins クライアントが展開するプレースホルダーです。Codex の `.codex/config.toml` へそのまま転記せず、Codex の実行環境で解決できる `cwd` またはパスへ置き換えます。
 
-## 5. Context7 の設定例
+## 5. このプロジェクトの設定例
 
-Context7 は Streamable HTTP と STDIO の両方で利用できます。このプロジェクトでは、Node.js を必要としない Streamable HTTP 接続を推奨します。
+本プロジェクトでは、公式ドキュメント用のmcpdoc、公開リポジトリの概要用のDeepWiki、正確なソース確認用のGitHub MCPを使用します。設定全体と運用方法は、[ドキュメント MCP ガイド](mcp/documentation-mcp-guide.md)を参照してください。
 
-本プロジェクトへ導入した設定の利用方法と検証手順は、[Context7 MCP ガイド](mcp/context7-mcp-guide.md)を参照してください。
+### 5.1 mcpdoc
 
-例ではサーバー識別名を `context7-project` としています。ユーザーの `~/.codex/config.toml` に同名の設定があるとCodexの設定階層で項目が混在する可能性があるため、プロジェクト固有の名前を使用します。
-
-### 5.1 推奨: Streamable HTTP
-
-`mcp.json`:
-
-~~~json
-{
-  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
-  "mcpServers": {
-    "context7-project": {
-      "type": "streamable-http",
-      "url": "https://mcp.context7.com/mcp"
-    }
-  }
-}
-~~~
-
-`.codex/config.toml`:
+mcpdocは `uvx` からSTDIOで起動します。Agent Pluginsでは `${PLUGIN_ROOT}` からローカルの `llms.txt` を解決します。Codexの相対 `cwd` は設定ファイルではなく起動プロセスを基準に解決されるため、BashでGitのリポジトリルートへ移動してから `uvx` を起動します。
 
 ~~~toml
-[mcp_servers.context7-project]
-url = "https://mcp.context7.com/mcp"
+[mcp_servers.mcpdoc-project]
+command = "bash"
+args = [
+  "-c",
+  '''
+set -e
+cd "$(git rev-parse --show-toplevel)"
+exec uvx \
+  --from mcpdoc==0.0.10 \
+  --with mcp==1.28.0 \
+  mcpdoc \
+  --urls \
+    Project:docs/agent-plugins/mcp/llms.txt \
+    Gradle:https://docs.gradle.org/llms.txt \
+    OpenAI:https://developers.openai.com/llms.txt \
+    MCP:https://modelcontextprotocol.io/llms.txt \
+    GitHub:https://docs.github.com/llms.txt \
+  --allowed-domains \
+    https://docs.oracle.com/ \
+    https://docs.spring.io/ \
+    https://documentation.red-gate.com/ \
+    https://java.testcontainers.org/ \
+    https://playwright.dev/ \
+  --follow-redirects \
+  --timeout 15 \
+  --transport stdio
+''',
+]
+startup_timeout_sec = 60
 enabled = true
 required = false
 ~~~
 
-### 5.2 代替: STDIO
+### 5.2 DeepWiki
 
-ローカルで起動する場合は、先に Context7 が要求するバージョンの Node.js と `npx` を利用できることを確認します。
-
-`mcp.json`:
-
-~~~json
-{
-  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
-  "mcpServers": {
-    "context7-project": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"]
-    }
-  }
-}
-~~~
-
-`.codex/config.toml`:
+DeepWikiはStreamable HTTPで接続します。
 
 ~~~toml
-[mcp_servers.context7-project]
-command = "npx"
-args = ["-y", "@upstash/context7-mcp@latest"]
+[mcp_servers.deepwiki-project]
+url = "https://mcp.deepwiki.com/mcp"
 enabled = true
 required = false
 ~~~
 
-`@latest` は常に最新リリースを取得するため、更新によって動作が変わる可能性があります。再現性を優先する場合は、動作確認した具体的なバージョンへ固定し、両方のファイルを同時に更新します。
+### 5.3 GitHub MCP
+
+GitHub MCPは公式DockerイメージをSTDIOで起動します。OAuth用ポートだけをループバックへ公開し、リポジトリ参照ツールに限定した読み取り専用モードを使用します。
+
+~~~toml
+[mcp_servers.github-project]
+command = "docker"
+args = [
+  "run",
+  "-i",
+  "--rm",
+  "-p",
+  "127.0.0.1:8085:8085",
+  "-e",
+  "GITHUB_OAUTH_CALLBACK_PORT",
+  "-e",
+  "GITHUB_READ_ONLY",
+  "-e",
+  "GITHUB_TOOLSETS",
+  "ghcr.io/github/github-mcp-server:v1.10.0",
+]
+env = { GITHUB_OAUTH_CALLBACK_PORT = "8085", GITHUB_READ_ONLY = "1", GITHUB_TOOLSETS = "repos" }
+startup_timeout_sec = 120
+enabled = true
+required = false
+~~~
 
 ## 6. 認証情報の管理
 
@@ -239,10 +256,14 @@ VS Code では次の手順で確認します。
 4. 設定変更後に反映されない場合は `Restart extension` を実行する
 5. 新しい会話で、対象 MCP サーバーの情報を使う依頼を試す
 
-Context7 の確認例:
+接続確認例:
 
 ~~~text
-Context7 を使って、現在の Spring Boot の公式ドキュメントを確認してください。
+mcpdocを使って、Spring Boot 4.1の公式ドキュメントを確認してください。
+
+DeepWikiを使って、spring-projects/spring-bootの構成を確認してください。
+
+GitHub MCPを使って、spring-projects/spring-bootのv4.1.0タグからファイルを確認してください。
 ~~~
 
 ## 9. よくある問題
@@ -262,7 +283,7 @@ Codex のローカルクライアントが MCP 設定として読み込むファ
 
 - `command` がインストールされ、`PATH` から解決できるか確認する
 - `command` と `args` を分離しているか確認する
-- Node.js など、サーバーが要求するランタイムのバージョンを確認する
+- `uvx` やDockerなど、サーバーが要求するランタイムのバージョンと起動状態を確認する
 - 必要に応じて `cwd` を明示する
 
 ### 認証に失敗する
@@ -276,7 +297,9 @@ Codex のローカルクライアントが MCP 設定として読み込むファ
 - [OpenAI Docs: Model Context Protocol](https://developers.openai.com/codex/mcp)
 - [OpenAI Docs: Config basics](https://learn.chatgpt.com/docs/config-file/config-basic)
 - [OpenAI Docs: Configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)
-- [Context7 MCP](https://github.com/upstash/context7/tree/master/packages/mcp)
-- [Context7 MCP ガイド](mcp/context7-mcp-guide.md)
+- [mcpdoc](https://github.com/langchain-ai/mcpdoc)
+- [DeepWiki MCP](https://docs.devin.ai/work-with-devin/deepwiki-mcp)
+- [GitHub MCP Server](https://github.com/github/github-mcp-server)
+- [ドキュメント MCP ガイド](mcp/documentation-mcp-guide.md)
 - [Agent Plugins 1.0.0 標準化ガイド](agent-plugins-1.0.0-guide.md)
 - [AGENTS.md ガイド](agents-md-guide.md)
