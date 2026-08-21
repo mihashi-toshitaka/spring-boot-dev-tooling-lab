@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "spring-boot-dev-tooling-lab",
   "version": "1.2.0",
-  "description": "Use mcpdoc, DeepWiki, and GitHub MCP to verify documentation and source code, fix SonarLint issues, and validate changes with the Gradle Wrapper.",
+  "description": "Use mcpdoc and GitHub MCP to verify documentation and source code, with Codex-only restricted DeepWiki access for public OSS, then fix SonarLint issues and validate changes with the Gradle Wrapper.",
   "repository": "https://github.com/mihashi-toshitaka/spring-boot-dev-tooling-lab",
   "keywords": [
     "spring-boot",

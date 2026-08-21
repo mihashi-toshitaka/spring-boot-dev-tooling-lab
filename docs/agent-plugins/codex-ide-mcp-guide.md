@@ -2,7 +2,11 @@
 
 このガイドは、Agent Plugins 1.0.0 の `mcp.json` で MCP サーバーを管理しながら、VS Code の Codex IDE 拡張から同じサーバーを利用する方法を説明します。
 
-Agent Plugins 1.0.0 と Codex は、MCP サーバー設定に異なるファイル形式を使用します。Agent Plugins のポータブルな設定はプラグインルート直下の `mcp.json`、Codex のプロジェクト設定は `.codex/config.toml` です。OpenAI 公式ドキュメントには、Codex が Agent Plugins の `mcp.json` を `.codex/config.toml` へ自動変換するという記載はありません。そのため、このプロジェクトでは同じ接続内容を両方のファイルへ定義します。
+Agent Plugins 1.0.0 と Codex は、MCP サーバー設定に異なるファイル形式を使用します。Agent Plugins のポータブルな設定はプラグインルート直下の `mcp.json`、Codex のプロジェクト設定は `.codex/config.toml` です。OpenAI 公式ドキュメントには、Codex が Agent Plugins の `mcp.json` を `.codex/config.toml` へ自動変換するという記載はありません。そのため、両方で利用する接続はそれぞれのファイルへ定義します。
+
+DeepWikiは例外です。`ask_question`を公開せず、公開OSSのWiki閲覧だけに限定するため、ツール許可リストを設定できるCodexの `.codex/config.toml` だけへ定義します。Agent Plugins向けの `mcp.json` にはDeepWikiを定義しません。
+
+本プロジェクトは商用の非公開リポジトリとして扱います。MCPサーバーを導入する前に、送信先、ツール入力、認証権限、保存期間、二次利用を確認し、[`AGENTS.md`](../../AGENTS.md#機密情報と外部ツール) の条件を満たす接続だけを追加します。
 
 ## 1. ファイルの役割
 
@@ -11,7 +15,7 @@ Agent Plugins 1.0.0 と Codex は、MCP サーバー設定に異なるファイ�
 | `mcp.json` | Agent Plugins 1.0.0 対応クライアント | ポータブルな MCP サーバー接続を定義する正本 |
 | `.codex/config.toml` | Codex CLI、Codex IDE 拡張 | Codex が実際に読み込むプロジェクト単位の MCP 設定 |
 
-サーバー名、トランスポート、URL、起動コマンド、引数など、両形式で表現できる接続情報は `mcp.json` を基準に同期します。`enabled`、`required`、ツール承認設定などの Codex 固有項目は `.codex/config.toml` だけで管理します。
+サーバー名、トランスポート、URL、起動コマンド、引数など、両形式で表現できる接続情報は `mcp.json` を基準に同期します。`enabled`、`required`、ツール許可リスト、ツール承認設定などのCodex固有項目は `.codex/config.toml` だけで管理します。DeepWikiのようにCodex固有の制限が必須となる接続は、同期対象から除外します。
 
 ~~~text
 spring-boot-dev-tooling-lab/
@@ -107,7 +111,7 @@ Agent Plugins の `${PLUGIN_ROOT}` や `${PLUGIN_DATA}` は Agent Plugins クラ
 
 ## 5. このプロジェクトの設定例
 
-本プロジェクトでは、公式ドキュメント用のmcpdoc、公開リポジトリの概要用のDeepWiki、正確なソース確認用のGitHub MCPを使用します。設定全体と運用方法は、[ドキュメント MCP ガイド](mcp/documentation-mcp-guide.md)を参照してください。
+本プロジェクトでは、公式ドキュメント用のmcpdoc、公開OSSのWiki閲覧用のDeepWiki、正確なソース確認用のGitHub MCPを使用します。DeepWikiはCodex限定であり、ほかの2サーバーだけをAgent PluginsとCodexの両方へ定義します。設定全体と運用方法は、[ドキュメント MCP ガイド](mcp/documentation-mcp-guide.md)を参照してください。
 
 ### 5.1 mcpdoc
 
@@ -149,14 +153,18 @@ required = false
 
 ### 5.2 DeepWiki
 
-DeepWikiはStreamable HTTPで接続します。
+DeepWikiはCodexからStreamable HTTPで接続します。`enabled_tools`を許可リストとして使用し、公開OSSのリポジトリ名だけを入力に取る `read_wiki_structure` と `read_wiki_contents` を公開します。質問文を入力に取る `ask_question` と、将来追加される未知のツールは公開しません。各呼び出しは実行前に承認を求めます。
 
 ~~~toml
 [mcp_servers.deepwiki-project]
 url = "https://mcp.deepwiki.com/mcp"
 enabled = true
 required = false
+enabled_tools = ["read_wiki_structure", "read_wiki_contents"]
+default_tools_approval_mode = "prompt"
 ~~~
+
+非公開リポジトリの解析には使用しません。DeepWikiへの通信自体を禁止する環境では、`enabled = false`へ変更します。
 
 ### 5.3 GitHub MCP
 
@@ -261,7 +269,7 @@ VS Code では次の手順で確認します。
 ~~~text
 mcpdocを使って、Spring Boot 4.1の公式ドキュメントを確認してください。
 
-DeepWikiを使って、spring-projects/spring-bootの構成を確認してください。
+DeepWikiの `read_wiki_structure` を使って、公開リポジトリ `spring-projects/spring-boot` の構成を確認してください。
 
 GitHub MCPを使って、spring-projects/spring-bootのv4.1.0タグからファイルを確認してください。
 ~~~
@@ -277,7 +285,7 @@ GitHub MCPを使って、spring-projects/spring-bootのv4.1.0タグからファ�
 
 ### `mcp.json` だけでは Codex IDE 拡張に表示されない
 
-Codex のローカルクライアントが MCP 設定として読み込むファイルは `config.toml` です。Agent Plugins の `mcp.json` と同じサーバーを `.codex/config.toml` にも定義します。
+Codex のローカルクライアントが MCP 設定として読み込むファイルは `config.toml` です。Agent Plugins とCodexの両方で使用するサーバーは `.codex/config.toml` にも定義します。Codex限定のDeepWikiは、`mcp.json` ではなく `.codex/config.toml` だけへ定義します。
 
 ### STDIO サーバーを起動できない
 

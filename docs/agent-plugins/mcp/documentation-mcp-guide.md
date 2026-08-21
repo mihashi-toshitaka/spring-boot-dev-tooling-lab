@@ -1,6 +1,12 @@
 # ドキュメント MCP ガイド
 
-このガイドは、本プロジェクトで使用する mcpdoc、DeepWiki、GitHub MCP の役割、設定、利用方法、検証方法を説明します。
+このガイドは、本プロジェクトで使用するmcpdoc、Codex限定のDeepWiki、GitHub MCPの役割、設定、利用方法、検証方法を説明します。
+
+## セキュリティ前提
+
+本プロジェクトは、ツール運用上、商用の非公開リポジトリとして扱います。ソースコード、差分、設定、非公開リポジトリ名、これらを含むプロンプトやログは、組織で承認された接続先と用途以外へ送信しません。外部ツール全体の導入条件は [`AGENTS.md`](../../../AGENTS.md#機密情報と外部ツール)を正本とします。
+
+MCP サーバーを追加するときは、送信先と各ツールの入力を確認し、必要な読み取りツールだけを許可します。制限を設定で強制できない接続は `mcp.json` へ追加しません。GitHub MCP から非公開リポジトリを参照する場合も、組織で承認された GitHub 接続と利用者の依頼がある範囲に限定します。
 
 ## 1. 役割分担
 
@@ -9,7 +15,7 @@
 | MCP | 主な用途 | 注意点 |
 | --- | --- | --- |
 | mcpdoc | Java、Spring、Gradleなどの公式ドキュメントを取得する | 登録済みの公式サイトだけを取得対象にする |
-| DeepWiki | 公開GitHubリポジトリの構造や設計を把握する | 生成された説明なので、バージョン固有の事実は別の根拠で確認する |
+| DeepWiki | Codexから公開OSSのWiki構造と内容を閲覧する | `ask_question`と非公開リポジトリの解析には使用しない |
 | GitHub MCP | タグ、リリース、実際のファイルやソースコードを確認する | GitHubアカウントによるOAuth認証が必要 |
 
 バージョン依存の質問では、最初に `build.gradle.kts` や Gradle Wrapper から対象バージョンを特定します。その後、公式ドキュメントをmcpdocで確認し、必要に応じてGitHub MCPで該当タグの実装を確認します。DeepWikiは概要や関連箇所を探すために使用し、最終的なバージョン判定の唯一の根拠にはしません。
@@ -23,7 +29,7 @@
 | [`mcp.json`](../../../mcp.json) | Agent Plugins 1.0.0 対応クライアント向けのポータブルな正本 |
 | [`.codex/config.toml`](../../../.codex/config.toml) | Codex CLI と VS Code の Codex IDE 拡張向けのプロジェクト設定 |
 
-両方に `mcpdoc-project`、`deepwiki-project`、`github-project` を定義します。Codex固有の `enabled`、`required`、起動タイムアウトは `.codex/config.toml` だけで管理します。すべて `required = false` のため、一つのMCPが利用できない場合でもCodex自体は起動を継続します。
+`mcp.json` には `mcpdoc-project` と `github-project` を定義し、`.codex/config.toml` にはこの2サーバーに加えて `deepwiki-project` を定義します。DeepWikiはCodex固有のツール許可リストと承認設定が必須であるため、Agent Plugins向けのポータブル設定には含めません。すべて `required = false` のため、一つのMCPが利用できない場合でもCodex自体は起動を継続します。
 
 Agent Pluginsでは `${PLUGIN_ROOT}` を使用し、mcpdocのローカル索引をプラグインルートから解決します。Codexの `cwd` は設定ファイルではなく起動プロセスを基準に解決されるため、`.codex/config.toml` ではBashからGitのリポジトリルートへ移動して `uvx` を起動します。これにより、リポジトリ直下とサブディレクトリのどちらからCodexを起動しても同じ索引を読み込めます。
 
@@ -41,7 +47,9 @@ uvx --version
 
 ### 3.2 DeepWiki
 
-DeepWikiは `https://mcp.deepwiki.com/mcp` へStreamable HTTPで接続します。公開リポジトリの参照にはアカウントやローカルランタイムは不要です。非公開リポジトリの確認には使用しません。
+DeepWikiはCodexから `https://mcp.deepwiki.com/mcp` へStreamable HTTPで接続します。公開リポジトリの参照にはアカウントやローカルランタイムは不要です。`enabled_tools`には `read_wiki_structure` と `read_wiki_contents` だけを指定し、各呼び出しの承認モードを `prompt` にします。質問文を入力に取る `ask_question`、非公開リポジトリの確認、Devin APIキーやGitHub Appを使った認証は対象外です。
+
+許可した2ツールからDeepWikiへ送る入力は公開GitHubリポジトリの `owner/repo` 名だけです。DeepWikiへの通信自体を禁止する必要がある場合は、`.codex/config.toml` の `enabled` を `false` にします。
 
 ### 3.3 GitHub MCP
 
@@ -111,13 +119,13 @@ mcpdocを使って、このプロジェクトが使用するSpring Boot 4.1のTe
 
 ## 5. DeepWiki
 
-DeepWikiは公開リポジトリの構造や、機能がどのモジュールへ実装されているかを把握するときに使用します。
+DeepWikiは公開OSSのリポジトリ構造や、機能がどのモジュールへ実装されているかをWikiから把握するときに使用します。
 
 ~~~text
-DeepWikiを使って、spring-projects/spring-bootのTestcontainers連携がどのモジュールで構成されているか説明してください。
+DeepWikiの読み取りツールを使って、公開リポジトリ `spring-projects/spring-boot` のTestcontainers連携がどのモジュールで構成されているか確認してください。
 ~~~
 
-`read_wiki_structure` で構成を確認し、必要な項目を `read_wiki_contents` または `ask_question` で調査します。説明の更新時点や対象ブランチがプロジェクトの依存バージョンと一致するとは限らないため、API名や挙動は公式ドキュメントまたはGitHub MCPで確認します。
+`read_wiki_structure` で構成を確認し、必要な項目を `read_wiki_contents` で取得します。`ask_question` は許可リストに含めません。説明の更新時点や対象ブランチがプロジェクトの依存バージョンと一致するとは限らないため、API名や挙動は公式ドキュメントまたはGitHub MCPで確認します。
 
 ## 6. GitHub MCP
 
@@ -167,7 +175,7 @@ jq empty plugin.json mcp.json
 
 JSON Schemaを含む詳細な検証方法は、[Agent Plugins 1.0.0標準化ガイド](../agent-plugins-1.0.0-guide.md#103-json-schema-検証)を参照してください。
 
-Codexが三つのサーバーを認識していることを確認します。
+Codexが三つのサーバーを認識し、DeepWikiに2つの読み取りツールだけが許可されていることを確認します。
 
 ~~~bash
 codex mcp list
@@ -183,8 +191,9 @@ codex mcp get github-project
 1. mcpdocの `list_doc_sources` にプロジェクト、Gradle、OpenAI、MCP、GitHubの索引が表示される
 2. mcpdocの `fetch_docs` でSpring Boot 4.1とGradleのページを取得できる
 3. DeepWikiで `spring-projects/spring-boot` の構造を取得できる
-4. GitHub OAuthを完了し、`v4.1.0`タグのファイルを取得できる
-5. GitHub MCPに書き込みツールが表示されない
+4. DeepWikiに `ask_question` が表示されず、各読み取りツールの呼び出し前に承認を求められる
+5. GitHub OAuthを完了し、`v4.1.0`タグのファイルを取得できる
+6. GitHub MCPに書き込みツールが表示されない
 
 ## 9. 更新方法
 
@@ -206,6 +215,7 @@ codex mcp get github-project
 
 - `https://mcp.deepwiki.com/mcp` へHTTPS接続できるか確認する
 - 対象が公開GitHubリポジトリであることを確認する
+- `ask_question` が表示されないことは意図した制限である
 - プロキシ、VPN、ファイアウォールの制限を確認する
 
 ### GitHub MCPを起動または認証できない

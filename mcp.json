@@ -35,10 +35,6 @@
       ],
       "cwd": "${PLUGIN_ROOT}"
     },
-    "deepwiki-project": {
-      "type": "streamable-http",
-      "url": "https://mcp.deepwiki.com/mcp"
-    },
     "github-project": {
       "type": "stdio",
       "command": "docker",

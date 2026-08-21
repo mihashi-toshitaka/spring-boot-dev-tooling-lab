@@ -164,7 +164,9 @@ sudo apt install -y python3 python3-pip
 
 ### 6. ドキュメント MCP の前提コマンド
 
-このプロジェクトは、公式ドキュメントを取得する mcpdoc、公開リポジトリを説明する DeepWiki、GitHub 上のソースコードを確認する GitHub MCP を使用します。詳しい役割分担と設定は、[ドキュメント MCP ガイド](docs/agent-plugins/mcp/documentation-mcp-guide.md)を参照してください。
+本プロジェクトは、ツール運用上、商用の非公開リポジトリとして扱います。外部ツールの導入と利用では、送信データを最小化し、組織で承認された接続先と権限だけを使用します。詳細なセキュリティ方針は [`AGENTS.md`](AGENTS.md#機密情報と外部ツール)を参照してください。
+
+このプロジェクトは、公式ドキュメントを取得するmcpdocと、GitHub上のソースコードを確認するGitHub MCPを使用します。Codexでは追加でDeepWikiを公開OSSのWiki構造と内容の閲覧だけに限定して利用し、`ask_question`や非公開リポジトリの解析には使用しません。詳しい役割分担と設定は、[ドキュメント MCP ガイド](docs/agent-plugins/mcp/documentation-mcp-guide.md)を参照してください。
 
 mcpdoc は `uvx` から起動します。`uv` が未インストールの場合は、[uv の公式手順](https://docs.astral.sh/uv/getting-started/installation/)に従ってインストールします。
 

@@ -345,12 +345,14 @@ spring-boot-dev-tooling-lab/
 ~~~
 
 - [`AGENTS.md`](../../AGENTS.md) は Codex へリポジトリ内の作業方針を伝えるクライアント固有ファイルであり、Agent Plugins 1.0.0 のポータブルコンポーネントではありません。詳細は [AGENTS.md ガイド](agents-md-guide.md)を参照してください。
-- [`.codex/config.toml`](../../.codex/config.toml) は、Codex CLI と Codex IDE 拡張がmcpdoc、DeepWiki、GitHub MCPへ接続するためのクライアント固有設定です。
-- [`mcp.json`](../../mcp.json) は、三つのMCP接続を定義するAgent Plugins 1.0.0のポータブルコンポーネントです。
+- [`.codex/config.toml`](../../.codex/config.toml) は、Codex CLI と Codex IDE 拡張がmcpdoc、公開OSS閲覧専用のDeepWiki、GitHub MCPへ接続するためのクライアント固有設定です。
+- [`mcp.json`](../../mcp.json) は、mcpdocとGitHub MCPの2接続を定義するAgent Plugins 1.0.0のポータブルコンポーネントです。Codex固有のツール制限が必要なDeepWikiは含めません。
 - [`plugin.json`](../../plugin.json) は Agent Plugins 1.0.0 の正規 `$schema` とプラグインメタデータを定義します。
 - [`fix-sonarlint-issues/SKILL.md`](../../skills/fix-sonarlint-issues/SKILL.md) は、SonarLint が表示した指摘を調査し、安全に修正して回帰確認する手順を提供します。
-- [ドキュメント MCP ガイド](mcp/documentation-mcp-guide.md) は、三つのMCPの役割分担、設定、利用、検証、更新方法を説明します。
+- [ドキュメント MCP ガイド](mcp/documentation-mcp-guide.md) は、三つのMCPの役割分担、クライアントごとの設定差、利用、検証、更新方法を説明します。
 - `docs/` は利用者向け資料であり、ポータブルコンポーネントとして自動発見されるディレクトリではありません。
+
+本プロジェクトはツール運用上、商用の非公開リポジトリとして扱います。Agent Plugins対応クライアントが `AGENTS.md` を解釈するとは限らないため、機密情報の保護を指示文だけに依存させず、必要なツール制限を各クライアントの接続設定で強制します。導入条件は [`AGENTS.md`](../../AGENTS.md#機密情報と外部ツール)を参照してください。
 
 ## 10. 作成と検証の手順
 

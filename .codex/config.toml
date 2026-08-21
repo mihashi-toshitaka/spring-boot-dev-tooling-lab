@@ -39,6 +39,8 @@ required = false
 url = "https://mcp.deepwiki.com/mcp"
 enabled = true
 required = false
+enabled_tools = ["read_wiki_structure", "read_wiki_contents"]
+default_tools_approval_mode = "prompt"
 
 [mcp_servers.github-project]
 command = "docker"
